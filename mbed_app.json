@@ -3,7 +3,7 @@
         "MBED_TRACE_MAX_LEVEL=TRACE_LEVEL_INFO",
         "MBED_CLIENT_USER_CONFIG_FILE=\"mbed_cloud_client_user_config.h\"",
         "MBED_CLOUD_CLIENT_USER_CONFIG_FILE=\"mbed_cloud_client_user_config.h\"",
-        "MBED_BOOTLOADER_SIZE=(32*1024)",
+        "MBED_BOOTLOADER_SIZE=(48*1024)",
         "ARM_UC_USE_PAL_BLOCKDEVICE=1"
     ],
     "target_overrides": {
@@ -20,9 +20,32 @@
             "mbed-trace.enable"                         : null,
             "events.shared-stacksize"                   : 2048,
             "nsapi.default-wifi-security"               : "WPA_WPA2",
-            "nsapi.default-wifi-ssid"                   : "\"SSID\"",
-            "nsapi.default-wifi-password"               : "\"PASSWORD\""
+            "nsapi.default-wifi-ssid"                   : "\"mbedEnabled\"",
+            "nsapi.default-wifi-password"               : "\"validation\""
         },
+        "CY8CPROTO_062_4343W": {
+	        "target.features_remove"                    : ["BLE"],
+            "target.extra_labels_remove"                : [ "CORDIO" ],				
+            "target.extra_labels_add"                   : [ "PSA" ],
+            "target.macros_add"                         : ["MBEDTLS_PSA_CRYPTO_C", "MBEDTLS_USER_CONFIG_FILE=\"mbedTLSConfig_mbedOS.h\""],
+            "target.network-default-interface-type"     : "WIFI",            
+            "target.bootloader_img"                     : "bootloader/mbed-bootloader_cy8cproto_tdb_internal_513_3tr.hex",			
+            "target.header_offset"                      : "0xC000",
+            "target.app_offset"                         : "0xC400",
+            "update-client.bootloader-details"          : "0x1000B16C",
+            "update-client.application-details"         : "0x1000C000",
+            "update-client.storage-address"             : "0x10106000",
+            "update-client.storage-size"                : "0xFA000",
+            "update-client.storage-locations"           : 1,
+            "mbed-cloud-client.update-storage"          : "ARM_UCP_FLASHIAP",
+            "storage_tdb_internal.internal_base_address": "0x10100000",
+            "storage_tdb_internal.internal_size"        : "0x6000",
+            "storage.storage_type"                      : "TDB_INTERNAL",
+            "target.bootloader_supported"               : true,
+            "target.mbed_rom_start"                     : "0x10000000",
+            "target.mbed_rom_size"                      : "0x00200000",
+            "target.sectors"                            : [[268435456, 512]]            
+        },        		
         "Freescale": {
             "lwip.mem-size"                             : 12500
         },
