@@ -4,7 +4,7 @@
         "MBED_CLIENT_USER_CONFIG_FILE=\"mbed_cloud_client_user_config.h\"",
         "MBED_CLOUD_CLIENT_USER_CONFIG_FILE=\"mbed_cloud_client_user_config.h\"",
         "MBED_BOOTLOADER_SIZE=(48*1024)",
-        "ARM_UC_USE_PAL_BLOCKDEVICE=1"
+        "ARM_UC_USE_PAL_BLOCKDEVICE=0"
     ],
     "target_overrides": {
         "*": {
@@ -27,9 +27,9 @@
 	        "target.features_remove"                    : ["BLE"],
             "target.extra_labels_remove"                : [ "CORDIO" ],				
             "target.extra_labels_add"                   : [ "PSA" ],
-            "target.macros_add"                         : ["MBEDTLS_PSA_CRYPTO_C", "MBEDTLS_USER_CONFIG_FILE=\"mbedTLSConfig_mbedOS.h\""],
+            "target.macros_add"                         : ["MBEDTLS_USER_CONFIG_FILE=\"mbedTLSConfig_mbedOS.h\""],
             "target.network-default-interface-type"     : "WIFI",            
-            "target.bootloader_img"                     : "bootloader/mbed-bootloader_cy8cproto_F0000.hex",		
+            "target.bootloader_img"                     : "bootloader/mbed-bootloader_cy8cproto.hex",		
             "target.header_offset"                      : "0x0000C000",
             "target.app_offset"                         : "0x0000C400",
             "update-client.bootloader-details"          : "0x10009C8C",
