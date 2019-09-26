@@ -44,7 +44,8 @@
             "target.bootloader_supported"               : true,
             "target.mbed_rom_start"                     : "0x10000000",
             "target.mbed_rom_size"                      : "0x00200000",
-            "target.sectors"                            : [[268435456, 512]]            
+            "target.sectors"                            : [[268435456, 512]],
+            "target.extra_labels_remove"                : ["CM0P_SLEEP"]         
         },        		
         "Freescale": {
             "lwip.mem-size"                             : 12500
