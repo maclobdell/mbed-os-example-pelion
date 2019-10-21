@@ -24,6 +24,9 @@
 
 #include "mbed-trace/mbed_trace.h"             // Required for mbed_trace_*
 
+#include "cypress_capsense.h"
+#include "blinker_app.h"
+
 // Pointers to the resources that will be created in main_application().
 static MbedCloudClient *cloud_client;
 static bool cloud_client_running = true;
@@ -33,9 +36,18 @@ static NetworkInterface *network = NULL;
 const uint8_t MBED_CLOUD_DEV_ENTROPY[] = { 0xf6, 0xd6, 0xc0, 0x09, 0x9e, 0x6e, 0xf2, 0x37, 0xdc, 0x29, 0x88, 0xf1, 0x57, 0x32, 0x7d, 0xde, 0xac, 0xb3, 0x99, 0x8c, 0xb9, 0x11, 0x35, 0x18, 0xeb, 0x48, 0x29, 0x03, 0x6a, 0x94, 0x6d, 0xe8, 0x40, 0xc0, 0x28, 0xcc, 0xe4, 0x04, 0xc3, 0x1f, 0x4b, 0xc2, 0xe0, 0x68, 0xa0, 0x93, 0xe6, 0x3a };
 
 static M2MResource* m2m_get_res;
+static M2MResource* m2m_get_res_led_rate;
 static M2MResource* m2m_put_res;
 static M2MResource* m2m_post_res;
 static M2MResource* m2m_deregister_res;
+
+/* Board Resources */
+InterruptIn  user_button(USER_BUTTON);
+//Ticker ticker;  can't use because callbacks execute from interrupt context
+Thread res_thread;
+EventQueue res_queue;
+
+uint32_t button_count = 0;  //store button count for updating the resource
 
 void print_client_ids(void)
 {
@@ -46,8 +58,8 @@ void print_client_ids(void)
 
 void button_press(void)
 {
-    m2m_get_res->set_value(m2m_get_res->get_value_int() + 1);
-    printf("Counter %" PRIu64 "\n", m2m_get_res->get_value_int());
+    //this is now called from interrupt context so can't use printf or do anything that needs a mutex
+    button_count++;	
 }
 
 void put_update(const char* /*object_name*/)
@@ -94,6 +106,14 @@ void update_progress(uint32_t progress, uint32_t total)
 {
     uint8_t percent = (uint8_t)((uint64_t)progress * 100 / total);
     printf("Update progress = %" PRIu8 "%%\n", percent);
+}
+
+void update_resources(void)
+{
+    m2m_get_res_led_rate->set_value(blinker_rate_get());
+    m2m_get_res->set_value(button_count);
+    printf("Button Counter %" PRIu64 "\n", m2m_get_res->get_value_int());
+	printf("Blink Rate %" PRIu64 "\n", m2m_get_res_led_rate->get_value_int());
 }
 
 int main(void)
@@ -144,9 +164,21 @@ int main(void)
         return -1;
     }
 
+    printf("Initializing Capacitive Touch Sensors\n");
+    if(capsense_main() != 0)
+	{
+		printf("Capacitive Touch Sensors failed to initialize \n");
+		return -1;
+	}
+	
+	user_button.fall(button_press);
+		
+	blinker_init();
+
     printf("Create resources\n");
     M2MObjectList m2m_obj_list;
 
+    // Resource for storing button press count
     // GET resource 3200/0/5501
     m2m_get_res = M2MInterfaceFactory::create_resource(m2m_obj_list, 3200, 0, 5501, M2MResourceInstance::INTEGER, M2MBase::GET_ALLOWED);
     if (m2m_get_res->set_value(0) != true) {
@@ -154,6 +186,15 @@ int main(void)
         return -1;
     }
 
+    // Resource for storing led blink rate
+    // GET resource 3200/1/5501
+    m2m_get_res_led_rate = M2MInterfaceFactory::create_resource(m2m_obj_list, 3200, 1, 5501, M2MResourceInstance::INTEGER, M2MBase::GET_ALLOWED);
+    if (m2m_get_res_led_rate->set_value(0) != true) {
+        printf("m2m_get_res_led_rate->set_value() failed\n");
+        return -1;
+    }
+
+    // Resource for generic variable
     // PUT resource 3201/0/5853
     m2m_put_res = M2MInterfaceFactory::create_resource(m2m_obj_list, 3201, 0, 5853, M2MResourceInstance::INTEGER, M2MBase::GET_PUT_ALLOWED);
     if (m2m_put_res->set_value(0) != true) {
@@ -165,6 +206,7 @@ int main(void)
         return -1;
     }
 
+    // Resource to trigger action 
     // POST resource 3201/0/5850
     m2m_post_res = M2MInterfaceFactory::create_resource(m2m_obj_list, 3201, 0, 5850, M2MResourceInstance::INTEGER, M2MBase::POST_ALLOWED);
     if (m2m_post_res->set_execute_function(execute_post) != true) {
@@ -184,6 +226,14 @@ int main(void)
     cloud_client->add_objects(m2m_obj_list);
     cloud_client->setup(network); // cloud_client->setup(NULL); -- https://jira.arm.com/browse/IOTCLT-3114
 
+
+//Start a ticker callback to update blink rate resource
+    //ticker.attach(&update_resources, 2);	
+//start a thread to update resources once every 2 seconds    
+	res_thread.start(callback(&res_queue, &EventQueue::dispatch_forever));
+    res_queue.call_every(2000, update_resources);   
+ 
+
     while(cloud_client_running) {
         int in_char = getchar();
         if (in_char == 'i') {
@@ -194,12 +244,13 @@ int main(void)
             printf("Storage erased, rebooting the device.\n\n");
             wait(1);
             NVIC_SystemReset();
-        } else if (in_char > 0 && in_char != 0x03) { // Ctrl+C is 0x03 in Mbed OS and Linux returns negative number
-            button_press(); // Simulate button press
-            continue;
         }
-        deregister_client();
-        break;
+		//} else if (in_char > 0 && in_char != 0x03) { // Ctrl+C is 0x03 in Mbed OS and Linux returns negative number
+        //    button_press(); // Simulate button press
+        //    continue;
+        //}
+        //deregister_client();
+        //break;
     }
     return 0;
 }
