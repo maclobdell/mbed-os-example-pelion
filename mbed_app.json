@@ -134,7 +134,6 @@
             "sd.SPI_CS"                                 : "PB_9"
         },
         "CY8CPROTO_062_4343W": {
-            "target.extra_labels_add"                   : [ "PSA" ],
             "target.macros_add"                         : ["MBEDTLS_USER_CONFIG_FILE=\"mbedTLSConfig_mbedOS.h\"", "MBED_BOOTLOADER_SIZE=(48*1024)", "ARM_UC_USE_PAL_BLOCKDEVICE=0"],
             "target.network-default-interface-type"     : "WIFI",            
             "target.bootloader_img"                     : "bootloader/mbed-bootloader_cy8cproto.hex",		
@@ -182,10 +181,16 @@
             "storage_tdb_internal.internal_base_address": "0x100C8000",
             "storage_tdb_internal.internal_size"        : "0x00020000",
             "storage.storage_type"                      : "TDB_INTERNAL",
+            "update-client.storage-address"             : "0x100E8000",
+            "update-client.storage-size"                : "0x000E8000",
+            "update-client.storage-locations"           : 1,          
+			"mbed-cloud-client.update-storage"          : "ARM_UCP_FLASHIAP",
+            "update-client.bootloader-details"          : "0x10000000",
+            "update-client.application-details"         : "0x10000000",
             "target.bootloader_supported"               : true,
             "target.mbed_rom_start"                     : "0x10000400",
             "target.mbed_rom_size"                      : "0x00200000",
-            "target.sectors"                            : [[268435456, 512]]			
+            "target.sectors"                            : [[268435456, 512]]
         }        						
     }
 }

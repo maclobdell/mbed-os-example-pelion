@@ -1,7 +1,7 @@
 # Pelion Client Mbed OS Example
 
 This is a simplified example with the following features:
-- Mbed OS 5.13 and Pelion Device Management Client 3.3.0 
+- Mbed OS 5.14 and Pelion Device Management Client 4.0.0 
 - Support for FW Update
 - 200 lines of code + credential sources
 
@@ -18,6 +18,7 @@ NXP K66F                          | Ethernet          | Internal Flash          
 ST NUCLEO_F429ZI                  | Ethernet          | Internal Flash           |  Internal Flash          |
 ST NUCLEO_F411RE                  | WiFi IDW01M1      | SD card                  |  SD card                 |
 Ublox UBLOX_EVK_ODIN_W2           | WiFi              | SD card                  |  SD card                 |
+Cypress CY8CKIT_062S2_4343w       | WiFi              | Internal Flash           |  Internal Flash          | 
 
 <span class="notes">**(*) Note**: the platforms require further testing</span>
 
