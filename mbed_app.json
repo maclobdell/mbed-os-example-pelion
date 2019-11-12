@@ -3,7 +3,6 @@
         "MBED_TRACE_MAX_LEVEL=TRACE_LEVEL_INFO",
         "MBED_CLIENT_USER_CONFIG_FILE=\"mbed_cloud_client_user_config.h\"",
         "MBED_CLOUD_CLIENT_USER_CONFIG_FILE=\"mbed_cloud_client_user_config.h\"",
-        "ARM_UC_USE_PAL_BLOCKDEVICE=1",
         "PAL_PLATFORM_DEFINED_CONFIGURATION=\"mbedOS_SST.h\"",
         "PAL_USER_DEFINED_CONFIGURATION=\"mbedOS_SST.h\""
     ],
@@ -30,7 +29,7 @@
             "lwip.mem-size"                             : 12500
         },
         "K64F": {
-            "target.macros_add"                         : ["MBEDTLS_USER_CONFIG_FILE=\"mbedTLSConfig_mbedOS.h\""],
+            "target.macros_add"                         : ["MBEDTLS_USER_CONFIG_FILE=\"mbedTLSConfig_mbedOS.h\"", "ARM_UC_USE_PAL_BLOCKDEVICE=1"],
             "target.network-default-interface-type"     : "ETHERNET",
             "target.bootloader_img"                     : "bootloader/mbed-bootloader-k64f-internal_flash-no_rot-v4.0.1.bin",
             "target.header_offset"                      : "0x8000",
@@ -48,7 +47,7 @@
             "storage.storage_type"                      : "TDB_INTERNAL"
         },
         "K66F": {
-            "target.macros_add"                         : ["MBEDTLS_USER_CONFIG_FILE=\"mbedTLSConfig_mbedOS.h\""],
+            "target.macros_add"                         : ["MBEDTLS_USER_CONFIG_FILE=\"mbedTLSConfig_mbedOS.h\"", "ARM_UC_USE_PAL_BLOCKDEVICE=1"],
             "target.network-default-interface-type"     : "ETHERNET",
             "target.bootloader_img"                     : "bootloader/mbed-bootloader-k66f-internal_flash-no_rot-v4.0.0.bin",
             "target.header_offset"                      : "0x8000",
@@ -64,7 +63,7 @@
             "storage.storage_type"                      : "TDB_INTERNAL"
         },
         "NUCLEO_F429ZI": {
-            "target.macros_add"                         : ["MBEDTLS_USER_CONFIG_FILE=\"mbedTLSConfig_mbedOS.h\""],
+            "target.macros_add"                         : ["MBEDTLS_USER_CONFIG_FILE=\"mbedTLSConfig_mbedOS.h\"", "ARM_UC_USE_PAL_BLOCKDEVICE=1"],
             "target.network-default-interface-type"     : "ETHERNET",
             "target.bootloader_img"                     : "bootloader/mbed-bootloader-nucleo_f429zi-internal_flash-no_rot-v4.0.0.bin",
             "target.header_offset"                      : "0x8000",
@@ -80,7 +79,7 @@
             "storage.storage_type"                      : "TDB_INTERNAL"
         },
         "UBLOX_EVK_ODIN_W2": {
-            "target.macros_add"                         : ["MBEDTLS_USER_CONFIG_FILE=\"mbedTLSConfig_mbedOS.h\""],
+            "target.macros_add"                         : ["MBEDTLS_USER_CONFIG_FILE=\"mbedTLSConfig_mbedOS.h\"", "ARM_UC_USE_PAL_BLOCKDEVICE=1"],
             "target.network-default-interface-type"     : "WIFI",
             "target.bootloader_img"                     : "bootloader/mbed-bootloader-ublox_evk_odin_w2-block_device-kvstore-v4.0.0.bin",
             "target.header_offset"                      : "0x10000",
@@ -103,7 +102,7 @@
         },
         "NUCLEO_F411RE": {
             "target.extra_labels_add"                   : ["PSA"],
-            "target.macros_add"                         : ["MBEDTLS_USER_CONFIG_FILE=\"mbedTLSConfig_mbedOS_SW_TRNG_PSA.h\"", "MBEDTLS_PSA_CRYPTO_C", "MBEDTLS_ENTROPY_NV_SEED", "PAL_USE_HW_TRNG=0"],
+            "target.macros_add"                         : ["MBEDTLS_USER_CONFIG_FILE=\"mbedTLSConfig_mbedOS_SW_TRNG_PSA.h\"", "MBEDTLS_PSA_CRYPTO_C", "MBEDTLS_ENTROPY_NV_SEED", "PAL_USE_HW_TRNG=0", "ARM_UC_USE_PAL_BLOCKDEVICE=1"],
             "target.network-default-interface-type"     : "WIFI",
             "target.bootloader_img"                     : "bootloader/mbed-bootloader-nucleo_f411re-block_device-kvstore-v4.0.0.bin",
             "target.header_offset"                      : "0x10000",
@@ -135,7 +134,7 @@
             "sd.SPI_CS"                                 : "PB_9"
         },
         "DISCO_L475VG_IOT01A": {
-            "target.macros_add"                         : ["MBEDTLS_USER_CONFIG_FILE=\"mbedTLSConfig_mbedOS.h\""],
+            "target.macros_add"                         : ["MBEDTLS_USER_CONFIG_FILE=\"mbedTLSConfig_mbedOS.h\"", "ARM_UC_USE_PAL_BLOCKDEVICE=1"],
             "target.network-default-interface-type"     : "WIFI",
             "target.bootloader_img"                     : "bootloader/mbed-bootloader-disco_l475vg_iot01a-external_kvstore-qspif.bin",
             "target.header_offset"                      : "0x11000",
