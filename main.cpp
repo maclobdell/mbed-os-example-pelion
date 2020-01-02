@@ -24,6 +24,8 @@
 
 #include "mbed-trace/mbed_trace.h"             // Required for mbed_trace_*
 
+#include "eink_display_app.h"
+
 #if defined(TARGET_CY8CKIT_064S2_4343W) && !defined(DISABLE_CY_FACTORY_FLOW)
     extern "C" fcc_status_e cy_factory_flow(void);
 #endif
@@ -109,6 +111,12 @@ int main(void)
         return -1;
     }
 
+    status = eink_display_app_start();
+    if (status != 0) {
+        printf("eink display init failed with %d\n", status);
+        return -1;
+    }
+    
     // Mount default kvstore
     printf("Application ready\n");
     status = kv_init_storage_config();
@@ -129,6 +137,7 @@ int main(void)
         printf("NetworkInterface failed to connect with %d\n", status);
         return -1;
     }
+   //todo - add netork retry, if fails to connect, go to simulated mode
 
     printf("Network initialized, connected with IP %s\n\n", network->get_ip_address());
 

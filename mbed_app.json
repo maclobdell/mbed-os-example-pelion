@@ -1,4 +1,16 @@
 {
+    "config": {
+        "EINK_MOSI":        "EINK_MOSI",
+        "EINK_MISO":        "EINK_MISO",
+        "EINK_SCLK":        "EINK_SCLK",
+        "EINK_DISPCS":      "EINK_DISPCS",
+        "EINK_DISPRST":     "EINK_DISPRST",
+        "EINK_DISPBUSY":    "EINK_DISPBUSY",
+        "EINK_DISCHARGE":   "EINK_DISCHARGE",
+        "EINK_DISPEN":      "EINK_DISPEN",
+        "EINK_BORDER":      "EINK_BORDER",
+        "EINK_DISPIOEN":    "EINK_DISPIOEN"
+    },  
     "macros": [
         "MBED_TRACE_MAX_LEVEL=TRACE_LEVEL_INFO",
         "MBED_CLIENT_USER_CONFIG_FILE=\"mbed_cloud_client_user_config.h\"",
@@ -19,7 +31,18 @@
             "events.shared-stacksize"                   : 2048,
             "nsapi.default-wifi-security"               : "WPA_WPA2",
             "nsapi.default-wifi-ssid"                   : "\"SSID\"",
-            "nsapi.default-wifi-password"               : "\"PASSWORD\""
+            "nsapi.default-wifi-password"               : "\"PASSWORD\"",
+            "target.components_add": ["EMWIN_NOSNTS"],
+            "EINK_MOSI":        "P12_0",
+            "EINK_MISO":        "P12_1",
+            "EINK_SCLK":        "P12_2",
+            "EINK_DISPCS":      "P12_3",
+            "EINK_DISPRST":     "P5_2",
+            "EINK_DISPBUSY":    "P5_3",
+            "EINK_DISCHARGE":   "P5_5",
+            "EINK_DISPEN":      "P5_4",
+            "EINK_BORDER":      "P5_6",
+            "EINK_DISPIOEN":    "P0_2"
         },
         "Freescale": {
             "lwip.mem-size"                             : 12500
@@ -170,7 +193,6 @@
                 "QSPI",
                 "SERIAL_FC",
                 "SERIAL_ASYNCH",
-                "SPI",
                 "SPI_ASYNCH",
                 "SPISLAVE",
                 "USBDEVICE",
