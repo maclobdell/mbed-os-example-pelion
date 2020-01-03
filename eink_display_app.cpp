@@ -7,12 +7,6 @@
 #include "cy_cy8ckit_028_epd.h"
 #include "LCDConf.h"
 
-#include "ThisThread.h"
-
-Thread eink_thread;
-
-#define DEMO_PAUSE_MS  6000
-
 /* External global references */
 extern GUI_CONST_STORAGE GUI_BITMAP bmCypressLogo_1bpp;
 
@@ -25,7 +19,6 @@ char update_percent_str[4]; /* XXX% */
 
 /* Function prototypes */
 void ShowPelionState(pelion_state_t);
-void eink_display_thread(void);
 
 /*******************************************************************************
 * Function Name: void UpdateDisplay(void)
@@ -97,19 +90,6 @@ void ShowStartupScreen(void)
     UpdateDisplay(CY_EINK_FULL_4STAGE, true);
 }
 
-/*******************************************************************************
-* Function Name: void ShowPelionStatevoid)
-********************************************************************************
-*
-* Summary: This function shows Pelion status
-*
-* Parameters:
-*  None
-*
-* Return:
-*  None
-*
-*******************************************************************************/
 
 void ShowPelionState(pelion_state_t state)
 {
@@ -212,6 +192,10 @@ void ClearScreen(void)
 
 int eink_display_app_start()
 {   
+
+    /* start the blinker thread */
+		blinker_start();  
+    
     /* Initialize EmWin driver*/
     GUI_Init();
     
@@ -223,8 +207,6 @@ int eink_display_app_start()
     if (Cy_EINK_Power(CY_EINK_ON) == CY_EINK_SUCCESS)
     {
         /* If powering of EINK display successful, continue with the demo */
-		    
-				eink_thread.start(eink_display_thread);
 				return 0;	
 		}else{
 			  /*return error*/
@@ -233,29 +215,7 @@ int eink_display_app_start()
 }
         
 
-void eink_display_thread()
-{
-    
-    /* Show the startup screen */
-    ShowStartupScreen();
-        
-    /* Display startup screen for 3 seconds */
-    //wait_ms(3000);
-    ThisThread::sleep_for(3000);
-
-		/* start the blinker thread */
-		blinker_start();  
-
-   while(1)
-	 {
-       /*TODO - change this to excplicitly block the task */
-       /*do nothing */
-		   ThisThread::sleep_for(30000);
-    }
-
-}
-
-int set_pelion_state(pelion_state_t state)
+void set_pelion_state(pelion_state_t state)
 {
 
   switch(state){
@@ -305,17 +265,19 @@ int set_pelion_state(pelion_state_t state)
       blinker_mode_set(BLINKER_MODE_SOLID);  
       break;					
     default:
-  
+      ShowPelionState(COMPLETE);
+      blinker_color_set(LED_COLOR_GREEN);
+      blinker_mode_set(BLINKER_MODE_SOLID);
   }
   
 }
 
-int set_pelion_download_percent(uint8_t p)
+void set_pelion_download_percent(uint8_t p)
 {
-    snrintf(update_percent_str, 4, "%2d\%", p);
-  
+    snprintf(update_percent_str, 4, "%2d", p);  
 }
-int set_fw_version(uint8_t maj, uint8_t min, uint8_t pat)
+
+void set_fw_version(uint8_t maj, uint8_t min, uint8_t pat)
 {
-    snrintf(version_str, 6, "%2d.%1d.%1d", maj, min, pat);
+    snprintf(version_str, 6, "%2d.%1d.%1d", maj, min, pat);
 }

@@ -14,9 +14,8 @@ enum pelion_state_t {
 
 /* Function prototypes */
 int eink_display_app_start(void);
-int set_pelion_state(pelion_state_t state);
-pelion_state_t get_pelion_state(void);
-int set_pelion_download_percent(uint8_t p);
-uint8_t get_pelion_download_percent(void);
+void set_pelion_state(pelion_state_t state);
+void set_pelion_download_percent(uint8_t p);
+void set_fw_version(uint8_t maj, uint8_t min, uint8_t pat);
 
 #endif
