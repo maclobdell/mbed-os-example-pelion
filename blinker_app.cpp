@@ -8,6 +8,7 @@
 #include "blinker_app.h"
 
 #define MAX_INDEX 7
+#define MAX_COLOR 7
 #define LED_OFF 1
 #define LED_ON 0
 
@@ -17,7 +18,7 @@ DigitalOut led_red(LED_RED, LED_OFF);
 DigitalOut led_green(LED_GREEN, LED_OFF);
 DigitalOut led_blue(LED_BLUE, LED_ON);
 
-uint8_t led_color = LED_COLOR_BLUE;
+uint8_t led_color = LED_COLOR_WHITE;
 uint8_t blinker_mode = BLINKER_MODE_OFF;
 void led_off(void);
 void led_on(void);
@@ -96,7 +97,7 @@ uint32_t blinker_rate_get(void)
 
 void blinker_color_set(uint8_t color)
 {
-    if(color > 0 && color < 4){
+    if(color > 0 && color <= MAX_COLOR){
        led_color = color;
     }
 }
@@ -130,5 +131,25 @@ void led_on(void)
       led_red = LED_OFF;
       led_green = LED_OFF;
       led_blue = LED_ON;
-    }           
+    }
+    else if(led_color == LED_COLOR_MAGENTA) {
+      led_red = LED_ON;
+      led_green = LED_OFF;
+      led_blue = LED_ON;
+    }
+    else if(led_color == LED_COLOR_CYAN) {
+      led_red = LED_OFF;
+      led_green = LED_ON;
+      led_blue = LED_ON;
+    }
+    else if(led_color == LED_COLOR_YELLOW) {
+      led_red = LED_ON;
+      led_green = LED_ON;
+      led_blue = LED_OFF;
+    }                       
+    else if(led_color == LED_COLOR_WHITE) {
+      led_red = LED_ON;
+      led_green = LED_ON;
+      led_blue = LED_ON;
+    }                           
 }

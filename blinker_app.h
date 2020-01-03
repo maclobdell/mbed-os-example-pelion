@@ -12,7 +12,11 @@ void blinker_mode_set(uint8_t);
    
 #define LED_COLOR_RED 1
 #define LED_COLOR_GREEN 2
-#define LED_COLOR_BLUE 3
+#define LED_COLOR_BLUE 3 
+#define LED_COLOR_MAGENTA 4
+#define LED_COLOR_CYAN 5 
+#define LED_COLOR_YELLOW 6
+#define LED_COLOR_WHITE 7
 #define BLINKER_MODE_OFF 0
 #define BLINKER_MODE_SOLID 1
 #define BLINKER_MODE_BLINKING 2

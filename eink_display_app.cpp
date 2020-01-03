@@ -249,13 +249,13 @@ void set_pelion_state(pelion_state_t state)
       break;					
     case DOWNLOADING:
       ShowPelionState(DOWNLOADING);
-      blinker_color_set(LED_COLOR_RED);		
+      blinker_color_set(LED_COLOR_CYAN);		
       blinker_rate_set(3);		
       blinker_mode_set(BLINKER_MODE_BLINKING);  
       break;					
     case INSTALLING:
       ShowPelionState(INSTALLING);
-      blinker_color_set(LED_COLOR_RED);		
+      blinker_color_set(LED_COLOR_CYAN);		
       blinker_rate_set(3);		
       blinker_mode_set(BLINKER_MODE_BLINKING);
       break;					
