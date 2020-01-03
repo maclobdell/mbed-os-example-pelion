@@ -25,6 +25,7 @@
 #include "mbed-trace/mbed_trace.h"             // Required for mbed_trace_*
 
 #include "eink_display_app.h"
+#include "app_version.h"
 
 #if defined(TARGET_CY8CKIT_064S2_4343W) && !defined(DISABLE_CY_FACTORY_FLOW)
     extern "C" fcc_status_e cy_factory_flow(void);
@@ -79,6 +80,9 @@ void deregister(void* /*arguments*/)
 
 void client_registered(void)
 {
+  
+    set_pelion_state(REGISTERED);
+  
     printf("Client registered.\n");
     print_client_ids();
 }
@@ -97,8 +101,20 @@ void client_error(int err)
 
 void update_progress(uint32_t progress, uint32_t total)
 {
+    static uint8_t start_flag;
+    
     uint8_t percent = (uint8_t)((uint64_t)progress * 100 / total);
     printf("Update progress = %" PRIu8 "%%\n", percent);
+    
+    if(percent == 0)
+    {
+      start_flag = 0;
+    }
+    if((percent == 1) & (start_flag == 0)) 
+    {
+        set_pelion_state(DOWNLOADING);
+        start_flag = 1;
+    }
 }
 
 int main(void)
@@ -117,6 +133,11 @@ int main(void)
         return -1;
     }
     
+    printf("App Version = %d.%d.%d\n\r", APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_PATCH);
+    set_fw_version(APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_PATCH);
+
+    set_pelion_state(CONNECTING);
+    
     // Mount default kvstore
     printf("Application ready\n");
     status = kv_init_storage_config();
@@ -124,6 +145,8 @@ int main(void)
         printf("kv_init_storage_config() - failed, status %d\n", status);
         return -1;
     }
+
+    set_pelion_state(CONNECTING);
 
     // Connect with NetworkInterface
     printf("Connect to network\n");
@@ -138,6 +161,8 @@ int main(void)
         return -1;
     }
    //todo - add netork retry, if fails to connect, go to simulated mode
+   
+   set_pelion_state(CONNECTED);
 
     printf("Network initialized, connected with IP %s\n\n", network->get_ip_address());
 

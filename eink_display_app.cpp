@@ -19,6 +19,10 @@ extern GUI_CONST_STORAGE GUI_BITMAP bmCypressLogo_1bpp;
 /* Display frame buffer cache */
 uint8 imageBufferCache[CY_EINK_FRAME_SIZE] = {0};
 
+pelion_state_t pelion_state = CONNECTING;
+char version_str[6];  /* XX.Y.Z */
+char update_percent_str[4]; /* XXX% */
+
 /* Function prototypes */
 void ShowPelionState(pelion_state_t);
 void eink_display_thread(void);
@@ -110,7 +114,10 @@ void ShowStartupScreen(void)
 void ShowPelionState(pelion_state_t state)
 {
     char state_str[12];
-	  
+    char fw_ver_str[24];
+
+		snprintf(fw_ver_str, 24, "Firmware Version %s ", version_str);
+    	  
 	  switch(state){
 			case CONNECTING:
 				snprintf(state_str, 12, "%s", "CONNECTING  "); 			
@@ -160,16 +167,16 @@ void ShowPelionState(pelion_state_t state)
     GUI_SetTextAlign(GUI_TA_HCENTER);
     GUI_DispStringAt("Firmware Update Status", 132, 70);
 
-    /* Font24_1*/
-    GUI_SetFont(GUI_FONT_24_1);
-    GUI_SetTextAlign(GUI_TA_HCENTER);
-    GUI_DispStringAt("Firmware Version 1.2", 132, 144);
-
     /* Font32_1*/
     GUI_SetFont(GUI_FONT_32_1);
     GUI_SetTextAlign(GUI_TA_HCENTER);	
     GUI_DispStringAt(state_str, 132, 97);
 	
+    /* Font24_1*/
+    GUI_SetFont(GUI_FONT_24_1);
+    GUI_SetTextAlign(GUI_TA_HCENTER);
+    GUI_DispStringAt(fw_ver_str, 132, 144);
+  
     UpdateDisplay(CY_EINK_FULL_4STAGE, true);
 //	UpdateDisplay(CY_EINK_FULL_4STAGE, false);
 }
@@ -225,16 +232,10 @@ int eink_display_app_start()
 		}		
 }
         
-/*****************************************************************************
-* Function Name: main()
-******************************************************************************
-* Summary:
-*   Main function that starts a thread for the display
-*
-*****************************************************************************/
 
 void eink_display_thread()
 {
+    
     /* Show the startup screen */
     ShowStartupScreen();
         
@@ -247,62 +248,74 @@ void eink_display_thread()
 
    while(1)
 	 {
-		 
-			 /*Get state */
+       /*TODO - change this to excplicitly block the task */
+       /*do nothing */
+		   ThisThread::sleep_for(30000);
+    }
 
-	    /*Display state */
-			blinker_color_set(LED_COLOR_BLUE);
-			blinker_mode_set(BLINKER_MODE_SOLID);
-			
-	    ShowPelionState(CONNECTING);
-			blinker_color_set(LED_COLOR_GREEN);
-			blinker_rate_set(2);
-			blinker_mode_set(BLINKER_MODE_BLINKING);
-	    //wait_ms(DEMO_PAUSE_MS);
-      ThisThread::sleep_for(DEMO_PAUSE_MS);
-							
-			ShowPelionState(CONNECTED);
-			blinker_color_set(LED_COLOR_GREEN);
-			blinker_mode_set(BLINKER_MODE_SOLID);
-      //wait_ms(DEMO_PAUSE_MS);
-      ThisThread::sleep_for(DEMO_PAUSE_MS);
-			
-			ShowPelionState(REGISTERED);
-			blinker_color_set(LED_COLOR_BLUE);
-			blinker_mode_set(BLINKER_MODE_SOLID);
-      //wait_ms(DEMO_PAUSE_MS);
-      ThisThread::sleep_for(DEMO_PAUSE_MS);
-			
-			ShowPelionState(REQUESTED);
-			blinker_color_set(LED_COLOR_BLUE);		
-			blinker_rate_set(2);
-			blinker_mode_set(BLINKER_MODE_BLINKING);
-      //wait_ms(DEMO_PAUSE_MS);
-      ThisThread::sleep_for(DEMO_PAUSE_MS);
-      			
-			ShowPelionState(PROCESSING);
-			blinker_color_set(LED_COLOR_BLUE);		
-			blinker_rate_set(3);
-			blinker_mode_set(BLINKER_MODE_BLINKING);
-      //wait_ms(DEMO_PAUSE_MS);
-      ThisThread::sleep_for(DEMO_PAUSE_MS);
-			
-			ShowPelionState(DOWNLOADING);
-			blinker_color_set(LED_COLOR_RED);		
-			blinker_rate_set(3);		
-			blinker_mode_set(BLINKER_MODE_BLINKING);
-      //wait_ms(DEMO_PAUSE_MS);
-      ThisThread::sleep_for(DEMO_PAUSE_MS);
-			
-			ShowPelionState(INSTALLING);
-      //wait_ms(DEMO_PAUSE_MS);
-      ThisThread::sleep_for(DEMO_PAUSE_MS);
-					
-			ShowPelionState(COMPLETE);
-			blinker_color_set(LED_COLOR_GREEN);
-			blinker_mode_set(BLINKER_MODE_SOLID);
-      //wait_ms(DEMO_PAUSE_MS);
-      ThisThread::sleep_for(DEMO_PAUSE_MS);
-			
-   } 
+}
+
+int set_pelion_state(pelion_state_t state)
+{
+
+  switch(state){
+    case CONNECTING:
+      ShowPelionState(CONNECTING);
+      blinker_color_set(LED_COLOR_GREEN);
+      blinker_rate_set(2);
+      blinker_mode_set(BLINKER_MODE_BLINKING);  
+      break;			
+    case CONNECTED:
+      ShowPelionState(CONNECTED);
+      blinker_color_set(LED_COLOR_GREEN);
+      blinker_mode_set(BLINKER_MODE_SOLID);  
+      break;			
+    case REGISTERED:
+      ShowPelionState(REGISTERED);
+      blinker_color_set(LED_COLOR_BLUE);
+      blinker_mode_set(BLINKER_MODE_SOLID);  
+      break;					
+    case REQUESTED:
+      ShowPelionState(REQUESTED);
+      blinker_color_set(LED_COLOR_BLUE);		
+      blinker_rate_set(2);
+      blinker_mode_set(BLINKER_MODE_BLINKING);  
+      break;					
+    case PROCESSING:
+      ShowPelionState(PROCESSING);
+      blinker_color_set(LED_COLOR_BLUE);		
+      blinker_rate_set(3);
+      blinker_mode_set(BLINKER_MODE_BLINKING);  
+      break;					
+    case DOWNLOADING:
+      ShowPelionState(DOWNLOADING);
+      blinker_color_set(LED_COLOR_RED);		
+      blinker_rate_set(3);		
+      blinker_mode_set(BLINKER_MODE_BLINKING);  
+      break;					
+    case INSTALLING:
+      ShowPelionState(INSTALLING);
+      blinker_color_set(LED_COLOR_RED);		
+      blinker_rate_set(3);		
+      blinker_mode_set(BLINKER_MODE_BLINKING);
+      break;					
+    case COMPLETE:
+      ShowPelionState(COMPLETE);
+      blinker_color_set(LED_COLOR_GREEN);
+      blinker_mode_set(BLINKER_MODE_SOLID);  
+      break;					
+    default:
+  
+  }
+  
+}
+
+int set_pelion_download_percent(uint8_t p)
+{
+    snrintf(update_percent_str, 4, "%2d\%", p);
+  
+}
+int set_fw_version(uint8_t maj, uint8_t min, uint8_t pat)
+{
+    snrintf(version_str, 6, "%2d.%1d.%1d", maj, min, pat);
 }
