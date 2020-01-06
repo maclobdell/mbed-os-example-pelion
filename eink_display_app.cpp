@@ -74,11 +74,11 @@ void ShowStartupScreen(void)
 {
     /* Set foreground and background color and font size */
     GUI_SetFont(GUI_FONT_24_1);
-    GUI_SetColor(GUI_BLACK);
-    GUI_SetBkColor(GUI_WHITE);
+    GUI_SetColor(GUI_WHITE);
+    GUI_SetBkColor(GUI_BLACK);
     GUI_Clear();
 
-    //GUI_DrawBitmap(&bmCypressLogo_1bpp, 2, 2);
+    GUI_DrawBitmap(&bmCypressLogo_1bpp, 2, 2);
     GUI_SetTextAlign(GUI_TA_HCENTER);
     GUI_DispStringAt("CYPRESS", 132, 85);
     GUI_SetTextAlign(GUI_TA_HCENTER);
@@ -94,9 +94,9 @@ void ShowStartupScreen(void)
 void ShowPelionState(pelion_state_t state)
 {
     char state_str[12];
-    char fw_ver_str[24];
+    char fw_ver_str[20];
 
-		snprintf(fw_ver_str, 24, "Firmware Version %s ", version_str);
+		snprintf(fw_ver_str, 20, "FW Version %s ", version_str);
     	  
 	  switch(state){
 			case CONNECTING:
@@ -122,43 +122,57 @@ void ShowPelionState(pelion_state_t state)
 				break;					
 			case COMPLETE:
 				snprintf(state_str, 12, "%s", "COMPLETE    ");
-				break;					
+				break;
+      case DEREGISTERED:
+				snprintf(state_str, 12, "%s", "DEREGISTERED");
+				break;        					
 			default:
 				snprintf(state_str, 12, "%s", "AMUSED      ");
     }
 	
     /* Set font size, background color and text mode */
     GUI_SetFont(GUI_FONT_24_1);
-    GUI_SetBkColor(GUI_WHITE);
-    GUI_SetColor(GUI_BLACK);
+    GUI_SetBkColor(GUI_BLACK);
+    GUI_SetColor(GUI_WHITE);
     GUI_SetTextMode(GUI_TM_NORMAL);
 
     /* Clear the display */
     GUI_Clear();
 
-    /* Display page title */
-    GUI_SetTextAlign(GUI_TA_HCENTER);
-    GUI_DispStringAt("Connected to", 132, 5);
+    if(state >= CONNECTED)
+    {
+      /* Display page title */
+      GUI_SetTextAlign(GUI_TA_HCENTER);
+      GUI_DispStringAt("Connected to", 132, 5);
+    }
   	GUI_SetTextAlign(GUI_TA_HCENTER);
-	  GUI_DispStringAt("Arm Pelion", 132, 20);
+	  GUI_DispStringAt("Arm Pelion", 132, 30);
 
     /* Font24_1*/
     GUI_SetFont(GUI_FONT_24_1);
     GUI_SetTextAlign(GUI_TA_HCENTER);
-    GUI_DispStringAt("Firmware Update Status", 132, 70);
+    GUI_DispStringAt("FW Update Status", 132, 70);
 
     /* Font32_1*/
     GUI_SetFont(GUI_FONT_32_1);
     GUI_SetTextAlign(GUI_TA_HCENTER);	
     GUI_DispStringAt(state_str, 132, 97);
 	
+/*    if(state == DOWNLOADING)
+    {
+      GUI_SetFont(GUI_FONT_32_1);
+      GUI_SetTextAlign(GUI_TA_RIGHT);	
+      GUI_DispStringAt(update_percent_str, 250, 97);
+    }
+*/  
     /* Font24_1*/
     GUI_SetFont(GUI_FONT_24_1);
     GUI_SetTextAlign(GUI_TA_HCENTER);
     GUI_DispStringAt(fw_ver_str, 132, 144);
   
-    UpdateDisplay(CY_EINK_FULL_4STAGE, true);
-//	UpdateDisplay(CY_EINK_FULL_4STAGE, false);
+    //
+    //UpdateDisplay(CY_EINK_FULL_4STAGE, true);
+    UpdateDisplay(CY_EINK_FULL_2STAGE, true);
 }
 
 /*******************************************************************************
@@ -176,8 +190,8 @@ void ShowPelionState(pelion_state_t state)
 *******************************************************************************/
 void ClearScreen(void)
 {
-    GUI_SetColor(GUI_BLACK);
-    GUI_SetBkColor(GUI_WHITE);
+    GUI_SetColor(GUI_WHITE);
+    GUI_SetBkColor(GUI_BLACK);
     GUI_Clear();
     UpdateDisplay(CY_EINK_FULL_4STAGE, true);
 }
@@ -192,6 +206,8 @@ void ClearScreen(void)
 
 int eink_display_app_start()
 {   
+  
+    //leds_test();
 
     /* start the blinker thread */
 		blinker_start();  
@@ -207,6 +223,8 @@ int eink_display_app_start()
     if (Cy_EINK_Power(CY_EINK_ON) == CY_EINK_SUCCESS)
     {
         /* If powering of EINK display successful, continue with the demo */
+        ShowStartupScreen();
+        ThisThread::sleep_for(2000);
 				return 0;	
 		}else{
 			  /*return error*/
@@ -264,6 +282,11 @@ void set_pelion_state(pelion_state_t state)
       blinker_color_set(LED_COLOR_GREEN);
       blinker_mode_set(BLINKER_MODE_SOLID);  
       break;					
+      case DEREGISTERED:
+        ShowPelionState(DEREGISTERED);
+        blinker_color_set(LED_COLOR_GREEN);
+        blinker_mode_set(BLINKER_MODE_BLINKING);  
+        break;					      
     default:
       ShowPelionState(COMPLETE);
       blinker_color_set(LED_COLOR_GREEN);

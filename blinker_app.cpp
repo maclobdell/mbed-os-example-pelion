@@ -153,3 +153,19 @@ void led_on(void)
       led_blue = LED_ON;
     }                           
 }
+
+void leds_test(void)
+{
+  led_red = LED_ON;
+  led_green = LED_OFF;
+  led_blue = LED_OFF;
+  ThisThread::sleep_for(2000);
+  led_red = LED_OFF;
+  led_green = LED_ON;
+  led_blue = LED_OFF;
+  ThisThread::sleep_for(2000);
+  led_red = LED_OFF;
+  led_green = LED_OFF;
+  led_blue = LED_ON;
+  ThisThread::sleep_for(2000);  
+}

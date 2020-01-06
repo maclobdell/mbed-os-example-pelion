@@ -9,7 +9,8 @@ enum pelion_state_t {
 	PROCESSING,
 	DOWNLOADING,
 	INSTALLING,
-	COMPLETE
+	COMPLETE,
+	DEREGISTERED
 }; 
 
 /* Function prototypes */
