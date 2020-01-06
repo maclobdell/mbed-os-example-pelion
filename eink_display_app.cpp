@@ -14,7 +14,7 @@ extern GUI_CONST_STORAGE GUI_BITMAP bmCypressLogo_1bpp;
 uint8 imageBufferCache[CY_EINK_FRAME_SIZE] = {0};
 
 pelion_state_t pelion_state = CONNECTING;
-char version_str[6];  /* XX.Y.Z */
+char version_str[7];  /* XX.Y.Z */
 char update_percent_str[4]; /* XXX% */
 
 /* Function prototypes */
@@ -302,5 +302,5 @@ void set_pelion_download_percent(uint8_t p)
 
 void set_fw_version(uint8_t maj, uint8_t min, uint8_t pat)
 {
-    snprintf(version_str, 6, "%2d.%1d.%1d", maj, min, pat);
+    snprintf(version_str, 7, "%2d.%1d.%1d", maj, min, pat);
 }

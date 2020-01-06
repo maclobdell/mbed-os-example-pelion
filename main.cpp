@@ -66,6 +66,7 @@ void execute_post(void* /*arguments*/)
 
 void deregister_client(void)
 {
+    set_pelion_state(DEREGISTERED);
     printf("Unregistering and disconnecting from the network.\n");
     cloud_client->close();
 }
