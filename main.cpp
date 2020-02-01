@@ -26,6 +26,8 @@
 
 #include "eink_display_app.h"
 #include "app_version.h"
+#include "cypress_capsense.h"
+#include "blinker_app.h"
 
 #if defined(TARGET_CY8CKIT_064S2_4343W) && !defined(DISABLE_CY_FACTORY_FLOW)
     extern "C" fcc_status_e cy_factory_flow(void);
@@ -37,9 +39,15 @@ static bool cloud_client_running = true;
 static NetworkInterface *network = NULL;
 
 static M2MResource* m2m_get_res;
+static M2MResource* m2m_get_res_led_rate;
+static M2MResource* m2m_get_res_led_rate_min;
+static M2MResource* m2m_get_res_led_rate_max;
 static M2MResource* m2m_put_res;
 static M2MResource* m2m_post_res;
 static M2MResource* m2m_deregister_res;
+  
+Thread res_thread;
+EventQueue res_queue;
 
 void print_client_ids(void)
 {
@@ -116,6 +124,12 @@ void update_progress(uint32_t progress, uint32_t total)
         set_pelion_state(DOWNLOADING);
         start_flag = 1;
     }
+}
+
+void update_resources(void)
+{
+    m2m_get_res_led_rate->set_value(blinker_rate_get());
+    printf("Blink Rate %" PRIu64 "\n", m2m_get_res_led_rate->get_value_int());
 }
 
 int main(void)
@@ -204,6 +218,15 @@ int main(void)
         return -1;
     }
 #endif
+    printf("Initializing Capacitive Touch Sensors\n");
+
+    if(capsense_main() != 0)
+    {
+        printf("Capacitive Touch Sensors failed to initialize \n");
+        return -1;
+    }
+
+    blinker_start();
 
     printf("Create resources\n");
     M2MObjectList m2m_obj_list;
@@ -215,6 +238,29 @@ int main(void)
         return -1;
     }
 
+    // Resource for storing led blink rate
+    // GET resource current rate
+    m2m_get_res_led_rate = M2MInterfaceFactory::create_resource(m2m_obj_list, 3346, 0, 5700, M2MResourceInstance::INTEGER, M2MBase::GET_ALLOWED);
+    if (m2m_get_res_led_rate->set_value(0) != true) {
+        printf("m2m_get_res_led_rate->set_value() failed\n");
+        return -1;
+    }
+
+    // GET resource min rate
+    m2m_get_res_led_rate_min = M2MInterfaceFactory::create_resource(m2m_obj_list, 3346, 0, 5603, M2MResourceInstance::INTEGER, M2MBase::GET_ALLOWED);
+    if (m2m_get_res_led_rate_min->set_value(0) != true) {
+        printf("m2m_get_res_led_rate_min->set_value() failed\n");
+        return -1;
+    }
+
+    // GET resource max rate
+    m2m_get_res_led_rate_max = M2MInterfaceFactory::create_resource(m2m_obj_list, 3346, 0, 5604, M2MResourceInstance::INTEGER, M2MBase::GET_ALLOWED);
+    if (m2m_get_res_led_rate_max->set_value(7) != true) {
+        printf("m2m_get_res_led_rate_max->set_value() failed\n");
+        return -1;
+    }
+
+    // Resource for generic variable
     // PUT resource 3201/0/5853
     m2m_put_res = M2MInterfaceFactory::create_resource(m2m_obj_list, 3201, 0, 5853, M2MResourceInstance::INTEGER, M2MBase::GET_PUT_ALLOWED);
     if (m2m_put_res->set_value(0) != true) {
@@ -248,6 +294,9 @@ int main(void)
     cloud_client = new MbedCloudClient(client_registered, client_unregistered, client_error, NULL, update_progress);
     cloud_client->add_objects(m2m_obj_list);
     cloud_client->setup(network); // cloud_client->setup(NULL); -- https://jira.arm.com/browse/IOTCLT-3114
+    //start a thread to update resources once every 2 seconds
+    res_thread.start(callback(&res_queue, &EventQueue::dispatch_forever));
+    res_queue.call_every(2000, update_resources);
 
     while(cloud_client_running) {
         int in_char = getchar();
