@@ -240,7 +240,7 @@ void set_pelion_state(pelion_state_t state)
     case CONNECTING:
       ShowPelionState(CONNECTING);
       blinker_color_set(LED_COLOR_GREEN);
-      blinker_rate_set(2);
+      blinker_rate_set(4);
       blinker_mode_set(BLINKER_MODE_BLINKING);  
       break;			
     case CONNECTED:
@@ -256,25 +256,25 @@ void set_pelion_state(pelion_state_t state)
     case REQUESTED:
       ShowPelionState(REQUESTED);
       blinker_color_set(LED_COLOR_BLUE);		
-      blinker_rate_set(2);
+      blinker_rate_set(4);
       blinker_mode_set(BLINKER_MODE_BLINKING);  
       break;					
     case PROCESSING:
       ShowPelionState(PROCESSING);
       blinker_color_set(LED_COLOR_BLUE);		
-      blinker_rate_set(3);
+      blinker_rate_set(5);
       blinker_mode_set(BLINKER_MODE_BLINKING);  
       break;					
     case DOWNLOADING:
       ShowPelionState(DOWNLOADING);
       blinker_color_set(LED_COLOR_CYAN);		
-      blinker_rate_set(3);		
+      blinker_rate_set(5);		
       blinker_mode_set(BLINKER_MODE_BLINKING);  
       break;					
     case INSTALLING:
       ShowPelionState(INSTALLING);
       blinker_color_set(LED_COLOR_CYAN);		
-      blinker_rate_set(3);		
+      blinker_rate_set(5);		
       blinker_mode_set(BLINKER_MODE_BLINKING);
       break;					
     case COMPLETE:

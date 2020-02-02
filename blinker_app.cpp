@@ -23,7 +23,7 @@ uint8_t blinker_mode = BLINKER_MODE_OFF;
 void led_off(void);
 void led_on(void);
 
-uint32_t blink_period[8] = {1000,750,500,250,100,50,25,5};
+uint32_t blink_period[8] = {4000,3000,2000,1000,500,250,100,50};
 
 volatile int32_t blink_index = 0;
 
@@ -32,18 +32,18 @@ void blinker_thread(void)
     while(true){
         //if(blink_period[blink_index] !=0)
         if(blinker_mode == BLINKER_MODE_BLINKING) {
-			/*blink the led */
-			led_on();			
+      			/*blink the led */
+      			led_on();			
             ThisThread::sleep_for(blink_period[blink_index]/2);
-			led_off();
+      			led_off();
             ThisThread::sleep_for(blink_period[blink_index]/2);			
         } else if(blinker_mode == BLINKER_MODE_SOLID) {
-			/*turn the led on and leave it */
-			led_on();
+      			/*turn the led on and leave it */
+      			led_on();
             ThisThread::sleep_for(200);
         } else {
-			/*turn the led off */
-			led_off();
+      			/*turn the led off */
+      			led_off();
             ThisThread::sleep_for(200);
         }
     }
@@ -105,7 +105,9 @@ void blinker_color_set(uint8_t color)
 void blinker_mode_set(uint8_t mode)
 {
     blinker_mode = mode;
-	
+    if(mode == BLINKER_MODE_SOLID){
+        blinker_rate_set(0);
+	  }
 }
 
 void led_off(void)
