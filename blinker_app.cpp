@@ -119,7 +119,12 @@ void led_off(void)
 
 void led_on(void)
 {   
-   if(led_color == LED_COLOR_RED) {
+    if(led_color == LED_COLOR_BLACK) {
+      led_red = LED_OFF;
+      led_green = LED_OFF;
+      led_blue = LED_OFF;
+    }
+    if(led_color == LED_COLOR_RED) {
       led_red = LED_ON;
       led_green = LED_OFF;
       led_blue = LED_OFF;
