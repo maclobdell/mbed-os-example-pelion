@@ -28,6 +28,7 @@
 #include "app_version.h"
 #include "cypress_capsense.h"
 #include "blinker_app.h"
+#include "wifi_credential_handler.h"
 
 #if defined(TARGET_CY8CKIT_064S2_4343W) && !defined(DISABLE_CY_FACTORY_FLOW)
     extern "C" fcc_status_e cy_factory_flow(void);
@@ -36,7 +37,8 @@
 // Pointers to the resources that will be created in main_application().
 static MbedCloudClient *cloud_client;
 static bool cloud_client_running = true;
-static NetworkInterface *network = NULL;
+//static NetworkInterface *network = NULL;
+static WiFiInterface *network = NULL;
 
 static M2MResource* m2m_get_res;
 static M2MResource* m2m_get_res_led_rate;
@@ -48,6 +50,8 @@ static M2MResource* m2m_deregister_res;
   
 Thread res_thread;
 EventQueue res_queue;
+char ssid_buf[40];
+char pswd_buf[40];     
 
 void print_client_ids(void)
 {
@@ -163,23 +167,40 @@ int main(void)
 
     set_pelion_state(CONNECTING);
 
+    status = get_wifi_credentials(ssid_buf, pswd_buf);
+    if (status != MBED_SUCCESS) {
+        printf("Failed to get wifi credentials from storage or user input.  Error \n");
+        return -1;
+    } else {
+       printf("\n\r");
+       printf("SSID: %s\r\n",ssid_buf);
+       printf("PASSWORD: ");
+       for(int p=0;p<strlen(pswd_buf); p++) { 
+         //print * for the number of password characters
+         printf("*");
+       }
+       printf("\r\n");
+    }
+
     // Connect with NetworkInterface
     printf("Connect to network\n");
-    network = NetworkInterface::get_default_instance();
+    //network = NetworkInterface::get_default_instance();
+    network = WiFiInterface::get_default_instance();
     if (network == NULL) {
         printf("Failed to get default NetworkInterface\n");
         return -1;
     }
-    status = network->connect();
+    printf("\nConnecting to [%s]...\n", (const char*) ssid_buf);
+    //status = network->connect();
+    status = network->connect( (const char*) ssid_buf, (const char*) pswd_buf, NSAPI_SECURITY_WPA_WPA2);
     if (status != NSAPI_ERROR_OK) {
         printf("NetworkInterface failed to connect with %d\n", status);
         return -1;
     }
-   //todo - add netork retry, if fails to connect, go to simulated mode
    
    set_pelion_state(CONNECTED);
 
-    printf("Network initialized, connected with IP %s\n\n", network->get_ip_address());
+    printf("Network initialized, connected with IP [%s]\n\n", network->get_ip_address());
 
 #if defined(DISABLE_CY_FACTORY_FLOW)
     // Run developer flow
@@ -306,12 +327,13 @@ int main(void)
         } else if (in_char == 'r') {
             (void) fcc_storage_delete(); // When 'r' is pressed, erase storage and reboot the board.
             printf("Storage erased, rebooting the device.\n\n");
-            wait(1);
+            ThisThread::sleep_for(1000);
             NVIC_SystemReset();
-        } else if (in_char > 0 && in_char != 0x03) { // Ctrl+C is 0x03 in Mbed OS and Linux returns negative number
+        } else if (in_char > 0 && in_char != 0x18) { // Ctrl+X is 0x18
             button_press(); // Simulate button press
             continue;
         }
+        // if Ctrl+X, then reach this point and trigger deregister
         deregister_client();
         break;
     }
