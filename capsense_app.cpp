@@ -278,9 +278,10 @@ void ProcessTouchStatus(void)
 
             // The range is 0~100, hash to 0~7
             blinker_mode_set(BLINKER_MODE_BLINKING);
+            blinker_rate_set(5);
             //blinker_rate_set(currSliderPos/14);
             blinker_color_set(currSliderPos/14);
-            printf("Slider position: %lu\n\r", currSliderPos);
+            printf("Slider: %lu \n\r", currSliderPos);
             prevSliderPos = currSliderPos;
         }
     }
