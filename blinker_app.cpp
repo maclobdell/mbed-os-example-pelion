@@ -129,18 +129,13 @@ void led_on(void)
       led_green = LED_OFF;
       led_blue = LED_OFF;
     }
-    else if(led_color == LED_COLOR_GREEN) {
-      led_red = LED_OFF;
-      led_green = LED_ON;
-      led_blue = LED_OFF;
-    } 
-    else if(led_color == LED_COLOR_BLUE) {
-      led_red = LED_OFF;
-      led_green = LED_OFF;
-      led_blue = LED_ON;
-    }
     else if(led_color == LED_COLOR_MAGENTA) {
       led_red = LED_ON;
+      led_green = LED_OFF;
+      led_blue = LED_ON;
+    }    
+    else if(led_color == LED_COLOR_BLUE) {
+      led_red = LED_OFF;
       led_green = LED_OFF;
       led_blue = LED_ON;
     }
@@ -148,7 +143,12 @@ void led_on(void)
       led_red = LED_OFF;
       led_green = LED_ON;
       led_blue = LED_ON;
-    }
+    }    
+    else if(led_color == LED_COLOR_GREEN) {
+      led_red = LED_OFF;
+      led_green = LED_ON;
+      led_blue = LED_OFF;
+    } 
     else if(led_color == LED_COLOR_YELLOW) {
       led_red = LED_ON;
       led_green = LED_ON;
