@@ -36,6 +36,8 @@
     Available update client trace flags:
     ARM_UC_PAAL_TRACE_ENABLE
 */
+#undef ARM_UC_PAAL_TRACE_ENABLE
+#define ARM_UC_PAAL_TRACE_ENABLE 1
 
 #if defined(MBED_CONF_MBED_TRACE_ENABLE) && MBED_CONF_MBED_TRACE_ENABLE == 1
 

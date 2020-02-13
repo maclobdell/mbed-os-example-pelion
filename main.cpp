@@ -24,7 +24,9 @@
 
 #include "mbed-trace/mbed_trace.h"             // Required for mbed_trace_*
 
-#include "eink_display_app.h"
+#ifdef EINK_DISPLAY
+  #include "eink_display_app.h"
+#endif
 #include "app_version.h"
 #include "cypress_capsense.h"
 #include "blinker_app.h"
@@ -78,7 +80,9 @@ void execute_post(void* /*arguments*/)
 
 void deregister_client(void)
 {
+  #ifdef EINK_DISPLAY
     set_pelion_state(DEREGISTERED);
+  #endif
     printf("Unregistering and disconnecting from the network.\n");
     cloud_client->close();
 }
@@ -93,9 +97,9 @@ void deregister(void* /*arguments*/)
 
 void client_registered(void)
 {
-  
+  #ifdef EINK_DISPLAY  
     set_pelion_state(REGISTERED);
-  
+  #endif
     printf("Client registered.\n");
     print_client_ids();
 }
@@ -125,7 +129,9 @@ void update_progress(uint32_t progress, uint32_t total)
     }
     if((percent == 1) & (start_flag == 0)) 
     {
+      #ifdef EINK_DISPLAY
         set_pelion_state(DOWNLOADING);
+      #endif
         start_flag = 1;
     }
 }
@@ -133,7 +139,7 @@ void update_progress(uint32_t progress, uint32_t total)
 void update_resources(void)
 {
     m2m_get_res_led_rate->set_value(blinker_rate_get());
-    printf("Blink Rate %" PRIu64 "\n", m2m_get_res_led_rate->get_value_int());
+    //printf("Blink Rate %" PRIu64 "\n", m2m_get_res_led_rate->get_value_int());
 }
 
 int main(void)
@@ -146,17 +152,20 @@ int main(void)
         return -1;
     }
 
+  #ifdef EINK_DISPLAY
     status = eink_display_app_start();
     if (status != 0) {
         printf("eink display init failed with %d\n", status);
         return -1;
     }
-    
+  #endif 
+   
     printf("App Version = %d.%d.%d\n\r", APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_PATCH);
+#ifdef EINK_DISPLAY
     set_fw_version(APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_PATCH);
-
     set_pelion_state(CONNECTING);
-    
+#endif 
+     
     // Mount default kvstore
     printf("Application ready\n");
     status = kv_init_storage_config();
@@ -165,8 +174,9 @@ int main(void)
         return -1;
     }
 
+  #ifdef EINK_DISPLAY
     set_pelion_state(CONNECTING);
-
+  #endif
     status = get_wifi_credentials(ssid_buf, pswd_buf);
     if (status != MBED_SUCCESS) {
         printf("Failed to get wifi credentials from storage or user input.  Error \n");
@@ -195,11 +205,30 @@ int main(void)
     status = network->connect( (const char*) ssid_buf, (const char*) pswd_buf, NSAPI_SECURITY_WPA_WPA2);
     if (status != NSAPI_ERROR_OK) {
         printf("NetworkInterface failed to connect with %d\n", status);
+        printf("Do you want to delete the saved SSID & Password? [y/n]: \n\r");
+        int in_char = getchar();
+        if (in_char == 'y') {
+            status = fcc_init();
+            if (status != FCC_STATUS_SUCCESS) {
+                printf("fcc_init() failed with %d\n", status);
+                return -1;
+            }
+            printf("Reset storage to an empty state.\n");
+            int fcc_status = fcc_storage_delete();
+            if (fcc_status != FCC_STATUS_SUCCESS) {
+                printf("Failed to delete storage - %d\n", status);
+                return -1;
+            }
+            printf("Reset storage done...Reseting device.\n");
+            ThisThread::sleep_for(10000);
+            NVIC_SystemReset();
+        }
         return -1;
     }
    
+  #ifdef EINK_DISPLAY
    set_pelion_state(CONNECTED);
-
+  #endif
     printf("Network initialized, connected with IP [%s]\n\n", network->get_ip_address());
 
 #if defined(DISABLE_CY_FACTORY_FLOW)
@@ -325,9 +354,15 @@ int main(void)
             print_client_ids(); // When 'i' is pressed, print endpoint info
             continue;
         } else if (in_char == 'r') {
-            (void) fcc_storage_delete(); // When 'r' is pressed, erase storage and reboot the board.
-            printf("Storage erased, rebooting the device.\n\n");
-            ThisThread::sleep_for(1000);
+             // When 'r' is pressed, erase storage and reboot the board.            
+            printf("Reset storage to an empty state.\n");
+            int fcc_status = fcc_storage_delete();
+            if (fcc_status != FCC_STATUS_SUCCESS) {
+                printf("Failed to delete storage - %d\n", status);
+                return -1;
+            }
+            printf("Reset storage done...Reseting device.\n");
+            ThisThread::sleep_for(10000);
             NVIC_SystemReset();
         } else if (in_char > 0 && in_char != 0x18) { // Ctrl+X is 0x18
             button_press(); // Simulate button press

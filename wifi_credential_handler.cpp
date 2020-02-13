@@ -23,13 +23,17 @@ uint8_t get_wifi_credentials(char *ssid_return_buf, char *pswd_return_buf)
      kcm_status_e status;
      kcm_status_e status2;
  
-     if (0) {
-         //alternative for testing
+     //#ifdef RESET_STORAGE
+      #if 1
+         // if about to reset the storage anyway, then just get user input, but don't save it
+         // this allows the system to connect the wifi if the credentials are corrupted in 
+         // the storage
          get_user_wifi_input(ssid_set_buf, pswd_set_buf);
          //copy ssid and password back to buffers from calling function
          strncpy(pswd_return_buf, pswd_set_buf,strlen(pswd_set_buf)+1);  
          strncpy(ssid_return_buf, ssid_set_buf,strlen(ssid_set_buf)+1);
-     }   
+         return MBED_SUCCESS;
+     #endif   
                   
      kcm_init();
  

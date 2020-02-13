@@ -1,3 +1,5 @@
+#ifdef EINK_DISPLAY
+
 #include "mbed.h"
 #include "blinker_app.h"
 #include "eink_display_app.h"
@@ -304,3 +306,5 @@ void set_fw_version(uint8_t maj, uint8_t min, uint8_t pat)
 {
     snprintf(version_str, 7, "%2d.%1d.%1d", maj, min, pat);
 }
+
+#endif //EINK_DISPLAY

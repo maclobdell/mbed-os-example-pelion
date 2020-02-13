@@ -409,7 +409,7 @@ ARM_UC_FEATURE_SIMPLE_COAP_SOURCE
 #define ARM_UC_DELTAPAAL_WRITE_BUF_SIZE 512
 #else
 // ToDo: should this be other than hard coded value
-#define ARM_UC_DELTAPAAL_WRITE_BUF_SIZE 128
+#define ARM_UC_DELTAPAAL_WRITE_BUF_SIZE 512
 #endif
 #ifdef SD_TEMP_DEFINE
 #undef SD
